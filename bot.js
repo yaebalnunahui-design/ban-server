@@ -2,12 +2,10 @@ const TelegramBot = require("node-telegram-bot-api");
 
 const token = "8589160707:AAEHCqUhzfom1D3_gtlG5eTiIrtPnXCGnNk";
 
-console.log("BOOT START");
-
 const bot = new TelegramBot(token, {
   polling: {
-    interval: 2000,
-    autoStart: true
+    autoStart: true,
+    interval: 1000
   }
 });
 
@@ -16,9 +14,9 @@ bot.on("polling_error", (err) => {
 });
 
 bot.on("message", (msg) => {
-  console.log("MSG RECEIVED:", msg.text);
+  console.log("GOT:", msg.text);
 
-  bot.sendMessage(msg.chat.id, "бот живой ✅");
+  bot.sendMessage(msg.chat.id, "бот работает ✅");
 });
 
-console.log("BOT READY");
+console.log("BOT STARTED");
