@@ -3,39 +3,40 @@ const app = express();
 
 app.use(express.json());
 
+// хранилище в памяти (пока простое)
 let banned = [];
 let allowed = [];
 
 // проверка бана
-app.get("/check/:id", (req,res)=>{
+app.get("/check/:id", (req, res) => {
   res.json({ banned: banned.includes(req.params.id) });
 });
 
 // бан
-app.post("/ban", (req,res)=>{
+app.post("/ban", (req, res) => {
   const { id } = req.body;
-  if(!banned.includes(id)) banned.push(id);
-  res.send("ok");
+  if (!banned.includes(id)) banned.push(id);
+  res.json({ ok: true });
 });
 
 // разбан
-app.post("/unban", (req,res)=>{
+app.post("/unban", (req, res) => {
   const { id } = req.body;
-  banned = banned.filter(x=>x!==id);
-  res.send("ok");
+  banned = banned.filter(x => x !== id);
+  res.json({ ok: true });
 });
 
 // разрешить дальше
-app.post("/allow", (req,res)=>{
+app.post("/allow", (req, res) => {
   const { id } = req.body;
-  if(!allowed.includes(id)) allowed.push(id);
-  res.send("ok");
+  if (!allowed.includes(id)) allowed.push(id);
+  res.json({ ok: true });
 });
 
-// проверка перехода
-app.get("/status/:id", (req,res)=>{
-  res.json({ allowed: allowed.includes(req.params.id) });
+app.get("/", (req, res) => {
+  res.send("Server running");
 });
 
-app.listen(3000);
-require("./bot.js");
+app.listen(process.env.PORT || 3000, () => {
+  console.log("Server started");
+});
