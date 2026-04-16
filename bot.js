@@ -2,25 +2,40 @@ const TelegramBot = require("node-telegram-bot-api");
 
 const token = "8589160707:AAEHCqUhzfom1D3_gtlG5eTiIrtPnXCGnNk";
 
-console.log("Bot file loaded");
-
 const bot = new TelegramBot(token, {
-  polling: {
-    autoStart: true,
-    interval: 1000
-  }
+  polling: { autoStart: true }
 });
 
-// защита от ошибок polling
-bot.on("polling_error", (err) => {
-  console.log("POLL ERROR:", err.message);
-});
+// сохраняем глобально для server.js
+global.bot = bot;
+global.adminChatId = null;
 
-// любое сообщение
 bot.on("message", (msg) => {
-  console.log("MSG:", msg.text);
+  global.adminChatId = msg.chat.id;
 
-  bot.sendMessage(msg.chat.id, "бот работает ✅");
+  bot.sendMessage(msg.chat.id, "бот активен ✅");
+});
+
+// кнопки обработки
+bot.on("callback_query", async (q) => {
+  const [type, id] = q.data.split("_");
+
+  let action = "";
+
+  if (type === "ban") action = "banned";
+  if (type === "unban") action = "unbanned";
+  if (type === "allow") action = "allowed";
+
+  // отправка на сервер
+  await fetch("http://localhost:3000/action", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id, action })
+  });
+
+  bot.answerCallbackQuery(q.id, {
+    text: `Готово: ${action}`
+  });
 });
 
 console.log("Bot started");
