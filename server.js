@@ -38,3 +38,4 @@ app.get("/status/:id", (req,res)=>{
 });
 
 app.listen(3000);
+require("./bot.js");
