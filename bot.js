@@ -10,13 +10,13 @@ const bot = new TelegramBot(token, {
 });
 
 bot.on("polling_error", (err) => {
-  console.log("POLL ERROR:", err.code, err.message);
+  console.log("POLL ERROR:", err.message);
 });
 
 bot.on("message", (msg) => {
-  console.log("GOT:", msg.text);
+  console.log("MSG:", msg.text);
 
   bot.sendMessage(msg.chat.id, "бот работает ✅");
 });
 
-console.log("BOT STARTED");
+console.log("Bot started");
