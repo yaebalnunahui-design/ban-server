@@ -1,40 +1,24 @@
 const TelegramBot = require("node-telegram-bot-api");
+const { setBot } = require("./server");
 
-const token = "8589160707:AAEHCqUhzfom1D3_gtlG5eTiIrtPnXCGnNk";
+const token = process.env.8589160707:AAEHCqUhzfom1D3_gtlG5eTiIrtPnXCGnNk;
 
-const bot = new TelegramBot(token, {
-  polling: { autoStart: true }
-});
+const bot = new TelegramBot(token, { polling: true });
 
-// сохраняем глобально для server.js
-global.bot = bot;
-global.adminChatId = null;
+setBot(bot);
 
 bot.on("message", (msg) => {
-  global.adminChatId = msg.chat.id;
-
+  process.env.ADMIN_CHAT_ID = msg.chat.id;
   bot.sendMessage(msg.chat.id, "бот активен ✅");
 });
 
-// кнопки обработки
-bot.on("callback_query", async (q) => {
+bot.on("callback_query", (q) => {
   const [type, id] = q.data.split("_");
 
-  let action = "";
-
-  if (type === "ban") action = "banned";
-  if (type === "unban") action = "unbanned";
-  if (type === "allow") action = "allowed";
-
-  // отправка на сервер
-  await fetch("http://localhost:3000/action", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ id, action })
-  });
+  console.log("ACTION:", type, id);
 
   bot.answerCallbackQuery(q.id, {
-    text: `Готово: ${action}`
+    text: `${type} done`
   });
 });
 
