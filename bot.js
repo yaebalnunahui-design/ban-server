@@ -1,25 +1,39 @@
 const TelegramBot = require("node-telegram-bot-api");
-const { setBot } = require("./server");
 
 const token = process.env.8589160707:AAEHCqUhzfom1D3_gtlG5eTiIrtPnXCGnNk;
 
+// создаём бот
 const bot = new TelegramBot(token, { polling: true });
 
-setBot(bot);
+console.log("Bot started");
 
+// любое сообщение
 bot.on("message", (msg) => {
-  process.env.ADMIN_CHAT_ID = msg.chat.id;
-  bot.sendMessage(msg.chat.id, "бот активен ✅");
+  bot.sendMessage(msg.chat.id, "бот работает ✅");
 });
 
-bot.on("callback_query", (q) => {
-  const [type, id] = q.data.split("_");
-
-  console.log("ACTION:", type, id);
-
-  bot.answerCallbackQuery(q.id, {
-    text: `${type} done`
+// команда теста заявки с кнопками
+bot.onText(/\/test/, (msg) => {
+  bot.sendMessage(msg.chat.id, "🆕 Заявка", {
+    reply_markup: {
+      inline_keyboard: [
+        [
+          { text: "🚫 Бан", callback_data: "ban_1" },
+          { text: "✅ Разбан", callback_data: "unban_1" }
+        ],
+        [
+          { text: "➡️ Разрешить", callback_data: "allow_1" }
+        ]
+      ]
+    }
   });
 });
 
-console.log("Bot started");
+// обработка кнопок
+bot.on("callback_query", (q) => {
+  console.log("CLICK:", q.data);
+
+  bot.answerCallbackQuery(q.id, {
+    text: "готово"
+  });
+});
