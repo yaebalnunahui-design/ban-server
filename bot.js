@@ -6,7 +6,6 @@ const bot = new TelegramBot(token, { polling: true });
 
 console.log("BOT STARTED");
 
-// тест заявки
 bot.onText(/\/test/, (msg) => {
   bot.sendMessage(msg.chat.id, "🆕 Заявка №123", {
     reply_markup: {
@@ -23,15 +22,7 @@ bot.onText(/\/test/, (msg) => {
   });
 });
 
-// клики по кнопкам
 bot.on("callback_query", (q) => {
   console.log("CLICK:", q.data);
-
-  let text = "ok";
-
-  if (q.data.startsWith("ban")) text = "🚫 забанено";
-  if (q.data.startsWith("unban")) text = "✅ разбан";
-  if (q.data.startsWith("allow")) text = "➡️ разрешено";
-
-  bot.answerCallbackQuery(q.id, { text });
+  bot.answerCallbackQuery(q.id, { text: "ok" });
 });
