@@ -2,27 +2,19 @@ const TelegramBot = require("node-telegram-bot-api");
 
 const token = process.env.8589160707:AAEHCqUhzfom1D3_gtlG5eTiIrtPnXCGnNk;
 
+console.log("START FILE");
+console.log("TOKEN EXISTS:", !!token);
+
 const bot = new TelegramBot(token, { polling: true });
 
+bot.on("polling_error", (e) => {
+  console.log("POLL ERROR:", e.message);
+});
+
+bot.on("message", (msg) => {
+  console.log("MESSAGE RECEIVED:", msg.text);
+
+  bot.sendMessage(msg.chat.id, "OK WORKING");
+});
+
 console.log("BOT STARTED");
-
-bot.onText(/\/test/, (msg) => {
-  bot.sendMessage(msg.chat.id, "🆕 Заявка №123", {
-    reply_markup: {
-      inline_keyboard: [
-        [
-          { text: "🚫 Бан", callback_data: "ban_123" },
-          { text: "✅ Разбан", callback_data: "unban_123" }
-        ],
-        [
-          { text: "➡️ Разрешить", callback_data: "allow_123" }
-        ]
-      ]
-    }
-  });
-});
-
-bot.on("callback_query", (q) => {
-  console.log("CLICK:", q.data);
-  bot.answerCallbackQuery(q.id, { text: "ok" });
-});
